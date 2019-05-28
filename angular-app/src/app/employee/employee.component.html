@@ -1,0 +1,51 @@
+<mat-toolbar>
+  <button mat-raised-button color="primary" (click)="openDialogRegisterEmployee()">Add New Employee</button>
+  <button mat-icon-button (click)="updateEmployeeList()">
+    <mat-icon aria-label="update">refresh</mat-icon>
+  </button>
+</mat-toolbar>
+<mat-progress-bar mode="indeterminate" *ngIf="isLoading"></mat-progress-bar>
+<mat-list role="list" class="list">
+  <mat-accordion>
+    <mat-expansion-panel *ngFor="let employee of employees$">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <b>{{ employee.name }}</b>
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <mat-list>
+        <h3 mat-subheader>Details</h3>
+        <mat-list-item>
+          <mat-icon mat-list-icon>attach_money</mat-icon>
+          <h4 mat-line>Position</h4>
+          <p mat-line>{{ employee.position }}</p>
+        </mat-list-item>
+        <mat-list-item>
+          <mat-icon mat-list-icon>attach_money</mat-icon>
+          <h4 mat-line>Office</h4>
+          <p mat-line>{{ employee.office }}</p>
+        </mat-list-item>
+        <mat-list-item>
+          <mat-icon mat-list-icon>attach_money</mat-icon>
+          <h4 mat-line>Salary</h4>
+          <p mat-line>{{ employee.salary }}</p>
+        </mat-list-item>
+      </mat-list>
+      <mat-action-row>
+        <button mat-icon-button [matMenuTriggerFor]="menu">
+          <mat-icon aria-label="options">more_vert</mat-icon>
+        </button>
+      </mat-action-row>
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item (click)="openDialogUpdateEmployee(employee)">
+          <mat-icon>edit</mat-icon>
+          <span>Edit</span>
+        </button>
+        <button mat-menu-item (click)="removeEmployee(employee._id)">
+          <mat-icon>delete</mat-icon>
+          <span>Remove</span>
+        </button>
+      </mat-menu>
+    </mat-expansion-panel>
+  </mat-accordion>
+</mat-list>
