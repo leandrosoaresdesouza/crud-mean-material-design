@@ -16,7 +16,7 @@ export class UpdateEmployeeComponent implements OnInit {
 
   constructor(
     public dialogRef: MatDialogRef<UpdateEmployeeComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: Employee,
+    @Inject(MAT_DIALOG_DATA) public data: any,
     private formBuilder: FormBuilder,
     private snackBar: MatSnackBar,
     private employeeService: EmployeeService
@@ -26,12 +26,15 @@ export class UpdateEmployeeComponent implements OnInit {
 
   ngOnInit() {
     this.updateEmployeeForm = this.formBuilder.group({
-      name: ['', [Validators.required]],
-      position: ['', [Validators.required]],
-      office: ['', [Validators.required]],
-      salary: [null, [Validators.required]]
+      name: [this.data.employee.name, [Validators.required]],
+      position: [this.data.employee.position, [Validators.required]],
+      office: [this.data.employee.office, [Validators.required]],
+      salary: [this.data.employee.salary, [Validators.required]]
     });
+  }
 
+  closeDialog() {
+    this.dialogRef.close();
   }
 
   onSubmit() {
@@ -39,17 +42,16 @@ export class UpdateEmployeeComponent implements OnInit {
     let employee: Employee = {
       ...this.updateEmployeeForm.value
     };
+    employee._id = this.data.employee._id;
 
     this.employeeService.updateEmployee(employee)
       .subscribe(
         (employee) => {
-          console.log(employee);
-          this.snackBar.open('Employee Created', 'OK', { duration: 4000 });
+          this.snackBar.open('Employee Updated', 'OK', { duration: 4000 });
           this.dialogRef.close(employee);
           this.isLoading = true;
         },
         (err) => {
-          console.log(err);
           this.snackBar.open('Ops, an error has ocurred', 'OK', { duration: 4000 });
           this.dialogRef.close();
           this.isLoading = true;

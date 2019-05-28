@@ -31,7 +31,10 @@ export class RegisterEmployeeComponent implements OnInit {
       office: ['', [Validators.required]],
       salary: [null, [Validators.required]]
     });
+  }
 
+  closeDialog() {
+    this.dialogRef.close();
   }
 
   onSubmit() {
@@ -43,13 +46,11 @@ export class RegisterEmployeeComponent implements OnInit {
     this.employeeService.registerEmployee(employee)
       .subscribe(
         (employee) => {
-          console.log(employee);
           this.snackBar.open('Employee Created', 'OK', { duration: 4000 });
           this.dialogRef.close(employee);
           this.isLoading = true;
         },
         (err) => {
-          console.log(err);
           this.snackBar.open('Ops, an error has ocurred', 'OK', { duration: 4000 });
           this.dialogRef.close();
           this.isLoading = true;

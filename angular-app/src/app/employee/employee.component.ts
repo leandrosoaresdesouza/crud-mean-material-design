@@ -1,8 +1,11 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { EmployeeService } from '../shared/employee.service';
 import { RegisterEmployeeComponent } from './register-employee/register-employee.component';
-import { MatDialog } from '@angular/material';
+import { MatDialog, MatSnackBar } from '@angular/material';
 import { Employee } from '../shared/employee';
+import { UpdateEmployeeComponent } from './update-employee/update-employee.component';
+import { Subject } from 'rxjs';
+import { takeUntil} from 'rxjs/operators';
 
 @Component({
   selector: 'app-employee',
@@ -13,11 +16,16 @@ export class EmployeeComponent implements OnInit {
 
   employees$: Employee[] = [];
   isLoading = true;
+  activeEmployee: any;
+  private unsubscribe$ = new Subject();
 
-  constructor(private employeeService: EmployeeService, private dialog: MatDialog) { }
+  constructor(
+    private employeeService: EmployeeService,
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar) { }
 
   ngOnInit() {
-    this.updateEmployeeList();
+    this.getEmployeeList();
   }
 
   openDialogRegisterEmployee(): void {
@@ -25,26 +33,30 @@ export class EmployeeComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (!result === undefined) {
+      if (result) {
         this.employees$.push(result);
       }
     });
   }
 
-  openDialogUpdateEmployee(): void {
-    const dialogRef = this.dialog.open(RegisterEmployeeComponent, {
+  openDialogUpdateEmployee(employee): void {
+    const dialogRef = this.dialog.open(UpdateEmployeeComponent, {
+      data: {
+        employee,
+      }
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (!result === undefined) {
-        this.employees$.push(result);
+      if (result) {
+        this.employees$[this.activeEmployee.index] = result;
       }
     });
   }
 
-  updateEmployeeList() {
+  getEmployeeList() {
     this.isLoading = true;
     this.employeeService.getEmployees()
+      .pipe(takeUntil(this.unsubscribe$))
       .subscribe((data: any) => {
         this.employees$ = data;
         this.isLoading = false;
@@ -55,18 +67,22 @@ export class EmployeeComponent implements OnInit {
 
   removeEmployee(_id) {
     this.employeeService.removeEmployee(_id)
+      .pipe(takeUntil(this.unsubscribe$))
       .subscribe(res => {
-        console.log(res);
-        this.updateEmployeeList();
+        this.snackBar.open('Employee Deleted', 'OK', { duration: 4000 });
+        this.getEmployeeList();
       }, (err) => {
-        console.log(err);
       });
   }
 
+  selectEmployee(index) {
+    this.activeEmployee = this.employees$[index];
+    this.activeEmployee.index = index;
+    this.openDialogUpdateEmployee(this.activeEmployee);
+  }
 
-
-  // updateEmployee(emp: Employee) {
-  //   this.employeeService.selectedEmployee = emp;
-  // }
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+  }
 
 }

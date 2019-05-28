@@ -10,6 +10,18 @@ import { EmployeeService } from './shared/employee.service';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { UpdateEmployeeComponent } from './employee/update-employee/update-employee.component';
+import { CurrencyMaskModule } from "ng2-currency-mask";
+import { CurrencyMaskConfig, CURRENCY_MASK_CONFIG } from "ng2-currency-mask/src/currency-mask.config";
+
+export const customCurrencyMaskConfig: CurrencyMaskConfig = {
+  align: "left",
+  allowNegative: true,
+  decimal: ",",
+  precision: 2,
+  prefix: "$ ",
+  suffix: "",
+  thousands: "."
+};
 
 @NgModule({
   declarations: [
@@ -25,13 +37,16 @@ import { UpdateEmployeeComponent } from './employee/update-employee/update-emplo
     NgMaterialModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpClientModule
+    HttpClientModule,
+    CurrencyMaskModule
   ],
   entryComponents: [
-    RegisterEmployeeComponent
+    RegisterEmployeeComponent,
+    UpdateEmployeeComponent
   ],
   providers: [
-    EmployeeService
+    EmployeeService,
+    { provide: CURRENCY_MASK_CONFIG, useValue: customCurrencyMaskConfig }
   ],
   bootstrap: [AppComponent]
 })

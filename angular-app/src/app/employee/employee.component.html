@@ -1,13 +1,13 @@
 <mat-toolbar>
   <button mat-raised-button color="primary" (click)="openDialogRegisterEmployee()">Add New Employee</button>
-  <button mat-icon-button (click)="updateEmployeeList()">
+  <button mat-icon-button (click)="getEmployeeList()">
     <mat-icon aria-label="update">refresh</mat-icon>
   </button>
 </mat-toolbar>
 <mat-progress-bar mode="indeterminate" *ngIf="isLoading"></mat-progress-bar>
-<mat-list role="list" class="list">
+<mat-list role="list" class="list" *ngIf="employees$.length > 0; else noEmployees">
   <mat-accordion>
-    <mat-expansion-panel *ngFor="let employee of employees$">
+    <mat-expansion-panel *ngFor="let employee of employees$, let i = index">
       <mat-expansion-panel-header>
         <mat-panel-title>
           <b>{{ employee.name }}</b>
@@ -28,7 +28,7 @@
         <mat-list-item>
           <mat-icon mat-list-icon>attach_money</mat-icon>
           <h4 mat-line>Salary</h4>
-          <p mat-line>{{ employee.salary }}</p>
+          <p mat-line>{{ employee.salary | currency }}</p>
         </mat-list-item>
       </mat-list>
       <mat-action-row>
@@ -37,7 +37,7 @@
         </button>
       </mat-action-row>
       <mat-menu #menu="matMenu">
-        <button mat-menu-item (click)="openDialogUpdateEmployee(employee)">
+        <button mat-menu-item (click)="selectEmployee(i)">
           <mat-icon>edit</mat-icon>
           <span>Edit</span>
         </button>
